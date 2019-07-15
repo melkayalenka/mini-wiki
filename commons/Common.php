@@ -25,12 +25,13 @@ class Common
         $matches[0] = preg_replace('/\**(\pL+)\**/', '<b>$1</b>', $matches[0]);
         return $matches[0];
     }
+
     private static function makeItalicText($matches = array()) {
         $matches[0] = preg_replace('/\\\\(\pL+)\\\\/', '<i>$1</i>', $matches[0]);
         return $matches[0];
     }
-    private static function makeHttp($matches = array()) {
 
+    private static function makeHttp($matches = array()) {
         $matches[0] = ltrim($matches[0],"((");
         $matches[0] = rtrim($matches[0],"))");
 
@@ -41,5 +42,4 @@ class Common
 
         return $matches[0];
     }
-
 }

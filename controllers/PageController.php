@@ -14,17 +14,21 @@ use yii\db\Exception;
 use yii\web\Controller;
 use app\models\Page;
 use yii\web\NotFoundHttpException;
+yii\helpers\VarDumper;
 
 class PageController extends Controller
 {
     /**
-     * @param $id
+     * @param $name
      * @return string
      * @throws NotFoundHttpException
      */
     public function actionView($name)
     {
         $model = $this->findModel($name);
+        if($model == null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
         return $this->render('page', compact('model'));
     }
     /**
@@ -37,6 +41,12 @@ class PageController extends Controller
         $formData['AddPageForm']['body'] = common::convertText($formData['AddPageForm']['body']);
         $model->attributes = $formData['AddPageForm'];
 
+        if (!$model->save()) {
+            $msg = 'Cannot add Page. Given data = ' . VarDumper::export($formData['AddPageForm']);
+            $msg = $msg . ' System error: ' . VarDumper::export($model->getErrors());
+            \Yii::error($msg, __METHOD__);
+            throw new HttpException();
+        }
         if ($model->save()) {
             return $this->redirect(['view', 'name' => $model->name]);
         }
@@ -46,11 +56,11 @@ class PageController extends Controller
         ]);
     }
     /**
-     * @param $id
+     * @param $name
      * @throws NotFoundHttpException
      * @return \yii\web\Response|string
      */
-    public function actionUpdate($name)
+    public function actionEdit($name)
     {
         if (($model = Page::findOne($name)) !== null) {
             $formData = \Yii::$app->request->post();
@@ -64,16 +74,20 @@ class PageController extends Controller
                 $updatedData = $formData['Page'];
                 $updatedData['body'] = common::convertText($updatedData['body']);
                 $model->attributes = $updatedData;
-                if ($model->save()) {
-                    return $this->redirect(['view', 'name' => $model->name]);
+                if (!$model->save()) {
+                    $msg = 'Cannot update Page. Given data = ' . VarDumper::export($formData['Page']);
+                    $msg = $msg . ' System error: ' . VarDumper::export($model->getErrors());
+                    \Yii::error($msg, __METHOD__);
+                    throw new HttpException();
                 }
+                return $this->redirect(['view', 'name' => $model->name]);
             }
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
     /**
-     * @param $id
+     * @param $name
      * @return string
      * @throws NotFoundHttpException
      * @throws Exception
@@ -84,7 +98,9 @@ class PageController extends Controller
             $model->deleted_at = date("Y-m-d H:i:s");
             $model->deleted_at = date("Y-m-d H:i:s");
             if(!$model->save()) {
-                throw new Exception("Error while page deleting");
+                $msg = 'Cannot delete Page. Given data = ' . VarDumper::export($model);
+                $msg = $msg . ' System error: ' . VarDumper::export($model->getErrors());
+                \Yii::error($msg, __METHOD__);
             }
             return $this->redirect('/');
         } else {

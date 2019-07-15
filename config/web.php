@@ -44,20 +44,15 @@ $config = [
             ],
         ],
         'db' => $db,
-
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
                 '<name:\w+>' => 'page/view',
                 '<action:\w+>' => 'page/<action>',
-                'update' => 'page/update',
-               // '<id:\d+>/<action>' => 'page/action',
-
-                //'product/<id:\d+>' => 'product/view',
+                '<name:\w+>/edit' => 'page/edit',
             ],
         ],
-
     ],
     'params' => $params,
 ];
