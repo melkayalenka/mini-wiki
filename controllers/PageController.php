@@ -22,9 +22,9 @@ class PageController extends Controller
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionView($id)
+    public function actionView($name)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($name);
         return $this->render('page', compact('model'));
     }
     /**
@@ -38,7 +38,7 @@ class PageController extends Controller
         $model->attributes = $formData['AddPageForm'];
 
         if ($model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'name' => $model->name]);
         }
         $formModel = new AddPageForm();
         return $this->render('create', [
@@ -50,9 +50,9 @@ class PageController extends Controller
      * @throws NotFoundHttpException
      * @return \yii\web\Response|string
      */
-    public function actionUpdate($id)
+    public function actionUpdate($name)
     {
-        if (($model = Page::findOne($id)) !== null) {
+        if (($model = Page::findOne($name)) !== null) {
             $formData = \Yii::$app->request->post();
             if(count($formData) == 0) {
                 $form = new AddPageForm();
@@ -65,7 +65,7 @@ class PageController extends Controller
                 $updatedData['body'] = common::convertText($updatedData['body']);
                 $model->attributes = $updatedData;
                 if ($model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['view', 'name' => $model->name]);
                 }
             }
         } else {
@@ -87,19 +87,6 @@ class PageController extends Controller
                 throw new Exception("Error while page deleting");
             }
             return $this->redirect('/');
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-    /**
-     * @param $id
-     * @return Page|null|\yii\db\ActiveRecord
-     * @throws NotFoundHttpException
-     */
-    protected function findModel($id)
-    {
-        if (($model = Page::findOne($id)) !== null) {
-            return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

@@ -49,11 +49,23 @@ class Page extends ActiveRecord
             ['body', 'string'],
         ];
     }
+    /**
+     * @param $id
+     * @return Page|null|\yii\db\ActiveRecord
+     * @throws NotFoundHttpException
+     */
+    protected function findModel($name)
+    {
+        if (($model = Page::findOne(['name' => $name, 'deleted_at' => null])) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
     public static function findAllPages() {
 
         $pages = Page::find()->where(['deleted_at' => null])->orderBy('id')->asArray()->all();
         return $pages;
     }
-
-
 }
